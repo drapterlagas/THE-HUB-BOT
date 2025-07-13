@@ -1,41 +1,41 @@
 import config from '../../config.cjs';
 
-const startTime = Date.now();
-
-const formatRuntime = (ms) => {
-  const totalSeconds = Math.floor(ms / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  return `${hours}h ${minutes}m ${seconds}s`;
-};
-
 const menu = async (m, sock) => {
   const prefix = config.PREFIX;
-  const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
+  const cmd = m.body.startsWith(prefix)
+    ? m.body.slice(prefix.length).split(' ')[0].toLowerCase()
+    : '';
+  const text = m.body.slice(prefix.length + cmd.length).trim();
 
   if (cmd === "menu") {
     const start = new Date().getTime();
     await m.React('💞');
     const end = new Date().getTime();
-    const responseTime = (end - start) / 1000;
+    const responseTime = ((end - start) / 1000).toFixed(2);
 
-    const runtime = formatRuntime(Date.now() - startTime);
-    const mode = m.isGroup ? "public" : "private";
-    const ownerName = config.OWNER_NAME || "ⓃⒺCⓉOR🍯";
+    const uptimeSeconds = process.uptime();
+    const hours = Math.floor(uptimeSeconds / 3600);
+    const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+    const seconds = Math.floor(uptimeSeconds % 60);
+    const uptime = `${hours}h ${minutes}m ${seconds}s`;
 
+    // Profile Picture Fallback
     let profilePictureUrl = 'https://files.catbox.moe/03qy6k.jpg';
     try {
-      const pp = await sock.profilePictureUrl(m.sender, 'image');
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 1500);
+      const pp = await sock.profilePictureUrl(m.sender, 'image', { signal: controller.signal });
+      clearTimeout(timeout);
       if (pp) profilePictureUrl = pp;
-    } catch (err) {
-      console.error("Error fetching profile picture:", err);
+    } catch {
+      console.log('🖼️ Failed to fetch profile pic.');
     }
 
     const menuText = `
-
-┏━✦━ ✨『 *THE-HUB-BOT* 』✨ ━✦━┓
+┏━✦━ ✨『 *THE-HUB-BOT-MENU* 』✨ ━✦━┓
+┃ 🤖 *Bot:*     THE-HUB-BOT
 ┃ 🔧 *Version:* 2.0.0
+┃ 📡 *Mode:*    Public
 ┃ ⚡ *Speed:*   ${responseTime}s
 ┃ ⏱️ *Uptime:*  ${uptime}
 ┃ 🧩 *Prefix:*  ${prefix}
@@ -166,22 +166,40 @@ const menu = async (m, sock) => {
 
 
 ━━━ ❖ ⚡ *THE-HUB-BOT V2.0* ⚡ ❖ ━━━
-`;
+✨ Innovating Chat, One Command at a Time ✨
+`.trim();
 
+    // Newsletter Context
+    const newsletterContext = {
+      forwardingScore: 999,
+      isForwarded: true,
+      forwardedNewsletterMessageInfo: {
+        newsletterName: "THE-HUB-BOT",
+        newsletterJid: "120363395396503029@newsletter"
+      }
+    };
+
+    // Send Image Menu
     await sock.sendMessage(m.from, {
       image: { url: profilePictureUrl },
-      caption: menuText.trim(),
-      contextInfo: {
-        forwardingScore: 5,
-        isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-          newsletterName: "THE-HUB-BOT-MENU",
-          newsletterJid: "120363395396503029@newsletter"
-        }
-      }
+      caption: menuText,
+      contextInfo: newsletterContext
+    }, { quoted: m });
+
+    // 🎧 Random Songs
+    const songUrls = [
+      ''
+    ];
+    const randomSong = songUrls[Math.floor(Math.random() * songUrls.length)];
+
+    await sock.sendMessage(m.from, {
+      audio: { url: randomSong },
+      mimetype: 'audio/mpeg',
+      ptt: false,
+      contextInfo: newsletterContext
     }, { quoted: m });
   }
 };
 
 export default menu;
-                          
+      
