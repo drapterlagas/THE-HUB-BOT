@@ -36,7 +36,6 @@ const menu = async (m, sock) => {
 
 ┏━✦━ ✨『 *THE-HUB-BOT* 』✨ ━✦━┓
 ┃ 🔧 *Version:* 2.0.0
-┃ 📡 *Mode:*    ${mode}
 ┃ ⚡ *Speed:*   ${responseTime}s
 ┃ ⏱️ *Uptime:*  ${uptime}
 ┃ 🧩 *Prefix:*  ${prefix}
