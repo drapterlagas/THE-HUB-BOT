@@ -1,210 +1,206 @@
 import config from '../../config.cjs';
 
-const startTime = Date.now();
-
-const formatRuntime = (ms) => {
-  const totalSeconds = Math.floor(ms / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  return `${hours}h ${minutes}m ${seconds}s`;
-};
-
 const menu = async (m, sock) => {
   const prefix = config.PREFIX;
-  const cmd = m.body.startsWith(prefix) ? m.body.slice(prefix.length).split(' ')[0].toLowerCase() : '';
+  const cmd = m.body.startsWith(prefix)
+    ? m.body.slice(prefix.length).split(' ')[0].toLowerCase()
+    : '';
+  const text = m.body.slice(prefix.length + cmd.length).trim();
 
   if (cmd === "menu") {
     const start = new Date().getTime();
-    await m.React('🪆');
+    await m.React('🔥');
     const end = new Date().getTime();
-    const responseTime = (end - start) / 1000;
+    const responseTime = ((end - start) / 1000).toFixed(2);
 
-    const runtime = formatRuntime(Date.now() - startTime);
-    const mode = m.isGroup ? "public" : "private";
-    const ownerName = config.OWNER_NAME || "POPKID";
+    const uptimeSeconds = process.uptime();
+    const hours = Math.floor(uptimeSeconds / 3600);
+    const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+    const seconds = Math.floor(uptimeSeconds % 60);
+    const uptime = `${hours}h ${minutes}m ${seconds}s`;
 
-    let profilePictureUrl = 'https://files.catbox.moe/e1k73u.jpg';
+    // Profile Picture Fallback
+    let profilePictureUrl = '';
     try {
-      const pp = await sock.profilePictureUrl(m.sender, 'image');
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 1500);
+      const pp = await sock.profilePictureUrl(m.sender, 'image', { signal: controller.signal });
+      clearTimeout(timeout);
       if (pp) profilePictureUrl = pp;
-    } catch (err) {
-      console.error("Error fetching profile picture:", err);
+    } catch {
+      console.log('🖼️ Failed to fetch profile pic.');
     }
 
     const menuText = `
+┏━✦━ ✨『 *THE-HUB-BOT* 』✨ ━✦━┓
+┃ 🤖 *Bot:*     THE-HUB-BOT
+┃ 🔧 *Version:* 2.0.0
+┃ 📡 *Mode:*    Public
+┃ ⚡ *Speed:*   ${responseTime}s
+┃ ⏱️ *Uptime:*  ${uptime}
+┃ 🧩 *Prefix:*  ${prefix}
+┃ 👑 *Owner:*   ⓃⒺCⓉOR🍯
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-╔══⬡ POPKID-XD BOT V2 ⬡══╗
-┃ 🧠 Dev   : Popkid KE
-┃ 🤖 Name  : Popkid-XD
-┃ ⚡ Uptime: ${runtime}
-┃ 🌐 Mode  : ${mode}
-┃ 🆙 Ver.  : 2.0.0
-┃ 🔧 Prefix: ${prefix}
-┃ 👑 Owner : ${ownerName}
-╚════════════════════╝
+🌟 *Welcome to the command hub!* 🌟
+╭─⟤ ✨ *𝑴𝑨𝑰𝑵 𝑴𝑬𝑵𝑼* ⟢ ──────
+│
+├── 🛠️ *Utility & Tools*
+│   ├ ⚡ .uptime    ⚙️
+│   ├ 🪄 .jid       🔍
+│   ├ 🛰️ .ping      📶
+│   ├ 📝 .request   📨
+│   ├ 🧰 .repo      🔧
+│   ├ 📦 .app       📱
+│   └ 🌐 .host      💻
+│
+├── 🌐 *Internet / Media*
+│   ├ ☀️ .weather   🌦️
+│   ├ 🎶 .play      🎧
+│   ├ 🎵 .play2     🎼
+│   ├ 🎺 .play3     🎷
+│   ├ 📹 .vv        🎥
+│   ├ 📺 .vv2       🎬
+│   ├ 📼 .vv3       📀
+│   ├ 🎞️ .video    📹
+│   ├ 🎯 .tiktokdl  🎵
+│   ├ 🐼 .tiktok    🎭
+│   ├ 🐦 .fbdl      🕊️
+│   ├ 🐘 .fb        📘
+│   ├ 🐳 .facebook  🌊
+│   ├ 🚀 .todown    ⬇️
+│   ├ 🎤 .lyrics    🎙️
+│   ├ 🖼️ .gimage    🖌️
+│   ├ 📸 .img       📷
+│   └ 🌄 .image     🏞️
+│
+├── 🎉 *Fun & Social*
+│   ├ 😈 .insult    👹
+│   ├ 💘 .love      💖
+│   └ 🎲 .dare      🎯
+│
+├── 📖 *Religion & AI*
+│   ├ 📜 .bible     ✝️
+│   └ 🤖 .gpt       🧠
+│
+├── 🔗 *Group Links & Invites*
+│   ├ 🔗 .linkgc    🌐
+│   ├ 🏷️ .grouplink 🔍
+│   ├ 🎫 .invite    ✉️
+│   ├ 🧲 .bring     💌
+│   └ 🚪 .join      🚶
+│
+├── 👥 *Group Management*
+│   ├ 🎉 .welcome   🎊
+│   ├ 🏷️ .tagall    🗣️
+│   ├ 💬 .statusreply 📝
+│   ├ 📝 .groupinfo 📰
+│   ├ 🔓 .group open/close 🔒
+│   ├ 🖼️ .getpp     🖼️
+│   ├ 🚶 .left      🚪
+│   ├ 🏃 .exit      🏠
+│   ├ 🚀 .leave     🏃
+│   ├ ❌ .remove    🚫
+│   ├ 👢 .kick      👢
+│   └ 💣 .kickall   💥
+│
+├── 🛡️ *Admin / Moderation*
+│   ├ 🔥 .makeadmin 👑
+│   ├ 🚀 .adminup   🛡️
+│   ├ 🎯 .promote   🏆
+│   ├ 🪓 .unadmin   🔽
+│   ├ ⬇️ .demote    🚫
+│   ├ 🗑️ .del       🗑️
+│   ├ 🚮 .delete    ✂️
+│   ├ 🌍 .blockcountry 🚷
+│   ├ 🚧 .blockunknown 🔒
+│   ├ 📵 .anticall  🚫
+│   ├ ⚔️ .antispam  🛡️
+│   ├ 🗃️ .antidelete on/off 🗂️
+│   ├ 🛡️ .security  🔐
+│   ├ 🐞 .bug       🪲
+│   └ 📣 .report    📝
+│
+├── ⚙️ *Group Settings*
+│   ├ 🔧 .settings  🛠️
+│   ├ 🔤 .setprefix 🔠
+│   ├ 🏷️ .setname   📝
+│   ├ 📝 .setgroupname 🏷️
+│   ├ 🖊️ .setgroupbio 📰
+│   ├ 📜 .setdesc   📖
+│   └ 📑 .setdescription 📝
+│
+├── 🔄 *Automation*
+│   ├ 🤖 .autotyping 🔄
+│   ├ 👁️ .autostatusview 👀
+│   ├ 👓 .autosview 🕶️
+│   ├ 📺 .autostatus 📝
+│   ├ 🎥 .autorecording 🎬
+│   ├ ❤️ .autoreact ❤️
+│   ├ 😉 .autolikestatus on/off🥰
+│   ├ 📖 .autoread   📚
+│   └ 🔥 .alwaysonline 🌐
+│
+├── 🎭 *Sticker & Media*
+│   ├ 🎨 .sticker   🖌️
+│   ├ 🗂️ .vcf       📇
+│   ├ 🔗 .url       🌎
+│   └ 🖼️ .logo      🎨
+│
+├── 🤖 *Bot Controls*
+│   ├ 🛠️ .update    🔄
+│   ├ 👑 .owner     👤
+│   ├ 🐙 .clonebot  🐚
+│   ├ 🪄 .pair      🧩
+│   ├ 🔍 .getpair   🧩
+│   ├ ⚖️ .mode      ⚙️
+│   ├ 💬 .chatbox   💭
+│   └ 🌟 .addprem   💎
+│
+├── 📜 *Menus & Misc*
+│   ├ 📜 .menu      🗒️
+│   ├ 📋 .menu2     📄
+│   ├ 🪄 .ht        ✨
+│   └ 🕶️ .hidetag   🥷
+│
+╰───────────────────────
 
-╔═『 *🌟 MAIN MENU* 』═╗
-┃ ⏺️ .menu
-┃ ⏺️ .speed
-┃ ⏺️ .alive
-┃ ⏺️ .bugmenu
-┃ ⏺️ .owner
-┃ ⏺️ .allcmds
-┃ ⏺️ .addpremium
-┃ ⏺️ .repo
-┃ ⏺️ .dev
-┃ ⏺️ .ping
-┃ ⏺️ .version
-╚════════════════════╝
 
-╔═『 *👑 OWNER ZONE* 』═╗
-┃ 👑 .join
-┃ 👑 .autoread
-┃ 👑 .pair
-┃ 👑 .leave
-┃ 👑 .jid
-┃ 👑 .autoblock
-┃ 👑 .statusreply
-┃ 👑 .restart
-┃ 👑 .host
-┃ 👑 .upload
-┃ 👑 .vv
-┃ 👑 .alwaysonline
-┃ 👑 .block
-┃ 👑 .unblock
-┃ 👑 .setstatusmsg
-┃ 👑 .setprefix
-┃ 👑 .setownername
-╚════════════════════╝
+━━━ ❖ ⚡ *THE-HUB-BOT V2.0* ⚡ ❖ ━━━
+✨ Innovating Chat, One Command at a Time ✨
+`.trim();
 
-╔═『 *🤖 AI SECTION* 』═╗
-┃ 🤖 .ai
-┃ 🤖 .gpt
-┃ 🤖 .lydia
-┃ 🤖 .gemini
-┃ 🤖 .chatbot
-╚════════════════════╝
+    // Newsletter Context
+    const newsletterContext = {
+      forwardingScore: 999,
+      isForwarded: true,
+      forwardedNewsletterMessageInfo: {
+        newsletterName: "THE-HUB-BOT",
+        newsletterJid: "120363395396503029@newsletter"
+      }
+    };
 
-╔═『 *🎨 CONVERTERS* 』═╗
-┃ 🎨 .attp
-┃ 🎨 .sticker
-┃ 🎨 .take
-┃ 🎨 .mp3
-┃ 🎨 .idch
-┃ 🎨 .ss
-┃ 🎨 .shorten
-╚════════════════════╝
-
-╔═『 *🔍 SEARCH* 』════╗
-┃ 🔍 .play
-┃ 🔍 .video
-┃ 🔍 .song
-┃ 🔍 .ytsearch
-┃ 🔍 .mediafire
-┃ 🔍 .facebook
-┃ 🔍 .instagram
-┃ 🔍 .tiktok
-┃ 🔍 .githubstalk
-┃ 🔍 .lyrics
-┃ 🔍 .app
-┃ 🔍 .pinterest
-┃ 🔍 .imdb
-┃ 🔍 .ipstalk
-╚════════════════════╝
-
-╔═『 *👥 GROUP ZONE* 』═╗
-┃ 👥 .kickall
-┃ 👥 .remove
-┃ 👥 .tagall
-┃ 👥 .hidetag
-┃ 👥 .group open
-┃ 👥 .group close
-┃ 👥 .add
-┃ 👥 .vcf
-┃ 👥 .left
-┃ 👥 .promoteall
-┃ 👥 .demoteall
-┃ 👥 .setdescription
-┃ 👥 .linkgc
-┃ 👥 .antilink
-┃ 👥 .antisticker
-┃ 👥 .antispam
-┃ 👥 .create
-┃ 👥 .setname
-┃ 👥 .promote
-┃ 👥 .demote
-┃ 👥 .groupinfo
-┃ 👥 .balance
-╚════════════════════╝
-
-╔═『 *🎧 AUDIO FX* 』═══╗
-┃ 🎧 .earrape
-┃ 🎧 .deep
-┃ 🎧 .blown
-┃ 🎧 .bass
-┃ 🎧 .nightcore
-┃ 🎧 .fat
-┃ 🎧 .fast
-┃ 🎧 .robot
-┃ 🎧 .tupai
-┃ 🎧 .smooth
-┃ 🎧 .slow
-┃ 🎧 .reverse
-╚══════════════════╝
-
-╔═『 *😊 REACTIONS* 』══╗
-┃ 😊 .bonk
-┃ 😊 .bully
-┃ 😊 .yeet
-┃ 😊 .slap
-┃ 😊 .nom
-┃ 😊 .poke
-┃ 😊 .awoo
-┃ 😊 .wave
-┃ 😊 .smile
-┃ 😊 .dance
-┃ 😊 .smug
-┃ 😊 .blush
-┃ 😊 .cringe
-┃ 😊 .sad
-┃ 😊 .happy
-┃ 😊 .shinobu
-┃ 😊 .cuddle
-┃ 😊 .glomp
-┃ 😊 .handhold
-┃ 😊 .highfive
-┃ 😊 .kick
-┃ 😊 .kill
-┃ 😊 .kiss
-┃ 😊 .cry
-┃ 😊 .bite
-┃ 😊 .lick
-┃ 😊 .pat
-┃ 😊 .hug
-╚════════════════════╝
-
-╭─────────────◆
-│ ⚡ *POPKID TECH NEWS*
-│ Stay updated with the
-│ latest tools, bots, and
-│ tips from Popkid KE!
-╰─────────────◆
-`;
-
+    // Send Image Menu
     await sock.sendMessage(m.from, {
       image: { url: profilePictureUrl },
-      caption: menuText.trim(),
-      contextInfo: {
-        forwardingScore: 5,
-        isForwarded: true,
-        forwardedNewsletterMessageInfo: {
-          newsletterName: "POPKID TECH",
-          newsletterJid: "120363420342566562@newsletter"
-        }
-      }
+      caption: menuText,
+      contextInfo: newsletterContext
+    }, { quoted: m });
+
+    // 🎧 Random Songs
+    const songUrls = [
+      ''
+    ];
+    const randomSong = songUrls[Math.floor(Math.random() * songUrls.length)];
+
+    await sock.sendMessage(m.from, {
+      audio: { url: randomSong },
+      mimetype: 'audio/mpeg',
+      ptt: false,
+      contextInfo: newsletterContext
     }, { quoted: m });
   }
 };
 
 export default menu;
+      
