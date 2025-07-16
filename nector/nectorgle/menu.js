@@ -9,7 +9,7 @@ const menu = async (m, sock) => {
 
   if (cmd === "menu") {
     const start = new Date().getTime();
-    await m.React('🔥');
+    await m.React('💲);
     const end = new Date().getTime();
     const responseTime = ((end - start) / 1000).toFixed(2);
 
