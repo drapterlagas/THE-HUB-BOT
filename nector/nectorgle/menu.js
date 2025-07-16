@@ -9,7 +9,7 @@ const menu = async (m, sock) => {
 
   if (cmd === "menu") {
     const start = new Date().getTime();
-    await m.React('💲);
+    await m.React('🔥');
     const end = new Date().getTime();
     const responseTime = ((end - start) / 1000).toFixed(2);
 
@@ -137,7 +137,7 @@ const menu = async (m, sock) => {
 │   ├ 📺 .autostatus 📝
 │   ├ 🎥 .autorecording 🎬
 │   ├ ❤️ .autoreact ❤️
-│   ├ 😉 .autolikestatus on/off🥰
+│   ├ 💞 .autolikestatus on/off😉
 │   ├ 📖 .autoread   📚
 │   └ 🔥 .alwaysonline 🌐
 │
@@ -189,7 +189,10 @@ const menu = async (m, sock) => {
 
     // 🎧 Random Songs
     const songUrls = [
-      ''
+      'https://files.catbox.moe/2b33jv.mp3',
+      'https://files.catbox.moe/0cbqfa.mp3',
+      'https://files.catbox.moe/j4ids2.mp3',
+      'https://files.catbox.moe/vv2qla.mp3'
     ];
     const randomSong = songUrls[Math.floor(Math.random() * songUrls.length)];
 
